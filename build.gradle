@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    testNgVersion = '7.10.2'
+    guiceVersion = '7.0.0'
+    retrofitVersion = '2.11.0'
+    lombokVersion = '1.18.36'
+    slf4jVersion = '2.0.7'
+    logbackVersion = '1.4.12'
+    retrofitConverterGsonVersion = '2.9.0'
+    gsonVersion = '2.9.0'
+    okhttpVersion = '4.12.0'
+    ownerVersion = '1.0.12'
+    hamcrestVersion = '3.0'
+}
+
+dependencies {
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    implementation "ch.qos.logback:logback-classic:${logbackVersion}"
+    implementation "com.google.inject:guice:${guiceVersion}"
+    implementation "com.squareup.retrofit2:retrofit:${retrofitVersion}"
+    implementation "com.squareup.retrofit2:converter-gson:${retrofitConverterGsonVersion}"
+    implementation "com.google.code.gson:gson:${gsonVersion}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${okhttpVersion}"
+    implementation "org.aeonbits.owner:owner:${ownerVersion}"
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testImplementation "org.testng:testng:${testNgVersion}"
+    implementation "org.hamcrest:hamcrest:${hamcrestVersion}"
+}
+
+test {
+    useTestNG() {
+        suites("src/test/resources/testng.xml")
+    }
+}
+

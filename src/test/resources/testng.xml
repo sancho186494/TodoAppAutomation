@@ -1,0 +1,30 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="Todo app api tests" verbose="1">
+    <test name="GET tests">
+        <classes>
+            <class name="org.todo_app.GetTests"/>
+        </classes>
+    </test>
+    <test name="POST tests">
+        <classes>
+            <class name="org.todo_app.PostTests"/>
+        </classes>
+    </test>
+    <test name="PUT tests">
+        <classes>
+            <class name="org.todo_app.PutTests"/>
+        </classes>
+    </test>
+    <test name="DELETE tests">
+        <classes>
+            <class name="org.todo_app.DeleteTests"/>
+        </classes>
+    </test>
+    <test name="WebSocket tests">
+        <classes>
+            <class name="org.todo_app.WebSocketTests"/>
+        </classes>
+    </test>
+</suite>
+
