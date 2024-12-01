@@ -56,7 +56,7 @@ Before you can run the tests, ensure you have the following installed on your sy
    ./gradlew test --tests tests.PostTodosTest
    ```
 
-3. **Run specific TestNG suites:**
+3. **After running tests, the test report will be available at:**
    ```bash
    build/reports/tests/test/index.html
    ```
