@@ -53,7 +53,7 @@ Before you can run the tests, ensure you have the following installed on your sy
 
 2. **Run specific TestNG suites:**
    ```bash
-   ./gradlew test --tests tests.PostTodosTest
+   ./gradlew test --tests PostTodosTest
    ```
 
 3. **After running tests, the test report will be available at:**

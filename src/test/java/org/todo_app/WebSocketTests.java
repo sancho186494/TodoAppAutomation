@@ -1,10 +1,7 @@
 package org.todo_app;
 
 import com.google.inject.Inject;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Guice;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import org.todo_app.api.TodoAppRestSteps;
 import org.todo_app.api.TodoAppWebSocketService;
 import org.todo_app.models.TodoTask;
@@ -24,13 +21,18 @@ public class WebSocketTests {
     @Inject
     private TodoAppWebSocketService wsService;
 
-    @BeforeMethod(alwaysRun = true)
-    public void beforeMethod() {
+    @BeforeClass(alwaysRun = true)
+    public void beforeClass() throws InterruptedException {
         wsService.connect();
     }
 
     @AfterMethod(alwaysRun = true)
     public void afterMethod() {
+        wsService.clearWsLog();
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void afterClass() {
         wsService.closeConnection();
     }
 
