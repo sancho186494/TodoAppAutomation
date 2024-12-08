@@ -12,13 +12,20 @@ public interface TodoAppRestService {
     @GET("/todos")
     Call<List<TodoTask>> getTodos();
 
+    @GET("/todos")
+    Call<List<TodoTask>> getTodos(@QueryMap Map<String, Object> queryParams);
+
     @POST("/todos")
     @Headers("Content-Type: application/json")
     Call<Void> createTodo(@Body Map<String, Object> body);
 
     @POST("/todos")
+    @Headers("Content-Type: application/json")
+    Call<Void> createTodo(@Body TodoTask body);
+
+    @POST("/todos")
     Call<Void> createTodo(@HeaderMap Map<String, String> headers,
-                          @Body Map<String, Object> body);
+                          @Body TodoTask body);
 
     @PUT("/todos/{id}")
     @Headers("Content-Type: application/json")
@@ -26,12 +33,17 @@ public interface TodoAppRestService {
                         @Body Map<String, Object> body);
 
     @PUT("/todos/{id}")
+    @Headers("Content-Type: application/json")
+    Call<Void> editTodo(@Path("id") int id,
+                        @Body TodoTask body);
+
+    @PUT("/todos/{id}")
     Call<Void> editTodo(@Path("id") int id,
                         @HeaderMap Map<String, String> headers,
-                        @Body Map<String, Object> body);
+                        @Body TodoTask body);
 
     @PUT("/todos")
-    Call<Void> editTodoNoPathId(@Body Map<String, Object> body);
+    Call<Void> editTodoNoPathId(@Body TodoTask body);
 
     @DELETE("/todos/{id}")
     Call<Void> deleteTodo(@Path("id") int id,

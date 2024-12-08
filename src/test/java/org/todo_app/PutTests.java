@@ -1,19 +1,25 @@
 package org.todo_app;
 
 import com.google.inject.Inject;
-import org.testng.annotations.BeforeMethod;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
-import org.todo_app.api.TodoAppRestSteps;
 import org.todo_app.models.TodoTask;
+import org.todo_app.steps.TodoAppRestSteps;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static java.lang.String.valueOf;
+import static java.net.HttpURLConnection.*;
+import static org.todo_app.utils.AllureMatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.todo_app.utils.AssertionsUtil.checkResponseCode;
 
+@Feature("TodoApp API")
+@Story("PUT methods")
 @Guice(modules = TodoAppModule.class)
 public class PutTests {
 
@@ -22,60 +28,64 @@ public class PutTests {
 
     private TodoTask todo;
 
-    @BeforeMethod(alwaysRun = true)
-    public void beforeMethod() {
-        todo = new TodoTask("New todo task");
-        checkResponseCode(todoAppRestSteps.createTodo(todo).code(), 201);
+    @DataProvider(name = "invalidRequestBodies")
+    public Object[][] invalidRequestBodies() {
+        return new Object[][] {
+                { Map.of("id", todo.getId(), "text", todo.getText()) },
+                { Map.of("completed", todo.isCompleted(), "text", todo.getText()) },
+                { Map.of("id", todo.getId(), "completed", todo.isCompleted()) }
+        };
     }
 
-    @Test
-    public void checkTodoChange() {
+    @DataProvider(name = "invalidFieldTypes")
+    public Object[][] invalidFieldTypes() {
+        return new Object[][] {
+                { Map.of("id", todo.getId(), "text", "some text", "completed", valueOf(todo.isCompleted())) },
+                { Map.of("id", valueOf(todo.getId()), "text", "some text", "completed", false) },
+                { Map.of("id", todo.getId(), "text", 123, "completed", false) }
+        };
+    }
+
+    @BeforeClass(alwaysRun = true)
+    public void beforeClass() {
+        todo = new TodoTask("New todo task");
+        checkResponseCode(todoAppRestSteps.createTodo(todo).code(), HTTP_CREATED);
+    }
+
+    @Test(description = "PUT method change todo task test")
+    public void a1_checkTodoChange() {
         todo.setText("Changed text").setCompleted(true);
-        checkResponseCode(todoAppRestSteps.editTodo(todo).code(), 200);
+        checkResponseCode(todoAppRestSteps.editTodo(todo).code(), HTTP_OK);
         assertThat("Not found changed todo", todo, is(in(todoAppRestSteps.getTodos().body())));
     }
 
-    @Test
-    public void checkTodoChangeNoPathId() {
+    @Test(description = "PUT method no path id test")
+    public void a2_checkTodoChangeNoPathId() {
         todo.setText("Changed new").setCompleted(true);
-        checkResponseCode(todoAppRestSteps.editTodoNoPathId(todo).code(), 405);
+        checkResponseCode(todoAppRestSteps.editTodoNoPathId(todo).code(), HTTP_BAD_METHOD);
         assertThat("Found changed todo", todo, is(not(in(todoAppRestSteps.getTodos().body()))));
     }
 
-    @Test
-    public void checkRequiredFields() {
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("id", todo.getId());
-        requestBody.put("text", todo.getText());
-        checkResponseCode(todoAppRestSteps.editTodo(todo.getId(), requestBody).code(), 400);
-        requestBody.remove("id");
-        requestBody.put("completed", todo.isCompleted());
-        checkResponseCode(todoAppRestSteps.editTodo(todo.getId(), requestBody).code(), 400);
-        requestBody.remove("text");
-        requestBody.put("id", todo.getId());
-        checkResponseCode(todoAppRestSteps.editTodo(todo.getId(), requestBody).code(), 400);
+    @Test(description = "PUT method check required fields test", dataProvider = "invalidRequestBodies")
+    public void a3_checkRequiredFields(Map<String, Object> requestBody) {
+        checkResponseCode(todoAppRestSteps.editTodo(todo.getId(), requestBody).code(), HTTP_BAD_REQUEST);
     }
 
-    @Test
-    public void checkInvalidFieldTypes() {
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("id", todo.getId());
-        requestBody.put("text", "some text");
-        requestBody.put("completed", String.valueOf(todo.isCompleted()));
-        checkResponseCode(todoAppRestSteps.editTodo(todo.getId(), requestBody).code(), 400);
-        requestBody.put("completed", false);
-        requestBody.put("id", String.valueOf(todo.getId()));
-        checkResponseCode(todoAppRestSteps.editTodo(todo.getId(), requestBody).code(), 400);
-        requestBody.put("id", todo.getId());
-        requestBody.put("text", 123);
-        checkResponseCode(todoAppRestSteps.editTodo(todo.getId(), requestBody).code(), 400);
+    @Test(description = "PUT method check invalid fields test", dataProvider = "invalidFieldTypes")
+    public void a4_checkInvalidFieldTypes(Map<String, Object> requestBody) {
+        checkResponseCode(todoAppRestSteps.editTodo(todo.getId(), requestBody).code(), HTTP_BAD_REQUEST);
     }
 
-    @Test
-    public void checkWrongHeader() {
+    @Test(description = "PUT method wrong header test")
+    public void a5_checkWrongHeader() {
         todo.setCompleted(true);
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "text/plain");
-        checkResponseCode(todoAppRestSteps.editTodo(todo, headers).code(), 415);
+        checkResponseCode(todoAppRestSteps.editTodo(todo, Map.of("Content-Type", "text/plain")).code(),
+                HTTP_UNSUPPORTED_TYPE);
+    }
+
+    @Test(description = "PUT method wrong todo task id test")
+    public void a6_checkWrongTodoId() {
+        todo.setId(todo.getId() + 1).setCompleted(true);
+        checkResponseCode(todoAppRestSteps.editTodo(todo).code(), HTTP_NOT_FOUND);
     }
 }

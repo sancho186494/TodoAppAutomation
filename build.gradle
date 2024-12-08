@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id("io.qameta.allure") version "2.12.0"
 }
 
 group = 'org.example'
@@ -26,6 +27,10 @@ ext {
     okhttpVersion = '4.12.0'
     ownerVersion = '1.0.12'
     hamcrestVersion = '3.0'
+    allureVersion = '2.29.1'
+    aspectjweaverVersion = '1.9.22.1'
+    allureComandlineVersion = '2.32.0'
+    allureOkhttpVersion = '2.29.1'
 }
 
 dependencies {
@@ -37,15 +42,22 @@ dependencies {
     implementation "com.google.code.gson:gson:${gsonVersion}"
     implementation "com.squareup.okhttp3:logging-interceptor:${okhttpVersion}"
     implementation "org.aeonbits.owner:owner:${ownerVersion}"
+    implementation "org.hamcrest:hamcrest:${hamcrestVersion}"
+    implementation "io.qameta.allure:allure-testng:${allureVersion}"
+    implementation "io.qameta.allure:allure-okhttp3:${allureOkhttpVersion}"
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    runtimeOnly "org.aspectj:aspectjweaver:${aspectjweaverVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testImplementation "org.testng:testng:${testNgVersion}"
-    implementation "org.hamcrest:hamcrest:${hamcrestVersion}"
 }
 
 test {
     useTestNG() {
         suites("src/test/resources/testng.xml")
     }
+}
+
+allure {
+    version = "${allureComandlineVersion}"
 }
 

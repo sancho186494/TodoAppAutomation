@@ -1,5 +1,6 @@
 package org.todo_app;
 
+import io.qameta.allure.okhttp3.AllureOkHttp3;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -15,6 +16,7 @@ public class RetrofitService {
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(interceptor)
+                .addInterceptor(new AllureOkHttp3())
                 .readTimeout(120, TimeUnit.SECONDS)
                 .build();
 
