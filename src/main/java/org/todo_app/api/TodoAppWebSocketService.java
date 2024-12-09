@@ -22,7 +22,7 @@ public class TodoAppWebSocketService {
     private final List<WsMessage> wsMessages = synchronizedList(new ArrayList<>());
     private final CountDownLatch connectionLatch = new CountDownLatch(1);
 
-    public void connect() throws InterruptedException {
+    public void connect() {
         TodoAppRestConfig config = ConfigFactory.create(TodoAppRestConfig.class);
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -30,7 +30,12 @@ public class TodoAppWebSocketService {
                 .build();
         webSocket = client.newWebSocket(request, new TodoAppWebSocketListener());
 
-        boolean connected = connectionLatch.await(10, TimeUnit.SECONDS);
+        boolean connected;
+        try {
+            connected = connectionLatch.await(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         if (!connected) {
             throw new RuntimeException("Failed to establish WebSocket connection within timeout");
         }

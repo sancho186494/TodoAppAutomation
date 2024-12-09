@@ -30,7 +30,7 @@ public class WebSocketTests {
     private TodoAppWebSocketService wsService;
 
     @BeforeClass(alwaysRun = true)
-    public void beforeClass() throws InterruptedException {
+    public void beforeClass() {
         wsService.connect();
     }
 

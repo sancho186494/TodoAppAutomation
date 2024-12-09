@@ -1,4 +1,4 @@
-package org.todo_app.functions;
+package org.todo_app.utils.functions;
 
 @FunctionalInterface
 public interface Predicate {
