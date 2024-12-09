@@ -1,6 +1,8 @@
 package org.todo_app.utils;
 
 import org.hamcrest.Matcher;
+import org.todo_app.functions.Predicate;
+import org.todo_app.functions.TreeConsumer;
 
 import java.time.Duration;
 import java.util.Optional;

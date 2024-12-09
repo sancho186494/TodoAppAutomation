@@ -3,6 +3,7 @@ package org.todo_app.utils;
 import io.qameta.allure.Allure;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
+import org.todo_app.functions.Predicate;
 
 import java.util.function.Supplier;
 
