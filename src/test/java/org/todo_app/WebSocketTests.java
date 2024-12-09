@@ -44,13 +44,13 @@ public class WebSocketTests {
         wsService.closeConnection();
     }
 
-    @Test(description = "WebSocket. Connection test")
+    @Test(description = "WebSocket. Check connection.")
     public void wsConnectionTest() {
         checkResponseCode(todoAppRestSteps.createTodo(new TodoTask("some task")).code(), HTTP_CREATED);
         assertThatWithWait("WebSocket log is empty", () -> !wsService.getWsMessages().isEmpty());
     }
 
-    @Test(description = "WebSocket. Received messages type test")
+    @Test(description = "WebSocket. Check received messages type.")
     public void checkWsCreateMessageType() {
         checkResponseCode(todoAppRestSteps.createTodo(new TodoTask("some task")).code(), HTTP_CREATED);
         assertThatWithWait("WebSocket message type doesn't equal expected type 'new_todo'",
@@ -58,7 +58,7 @@ public class WebSocketTests {
                         .anyMatch(message -> message.getType().equals("new_todo")));
     }
 
-    @Test(description = "WebSocket. Received message with new todo test")
+    @Test(description = "WebSocket. Check received message with new todo task.")
     public void checkWsMessageTodoExists() {
         TodoTask todoTask = new TodoTask("Test websocket message");
         checkResponseCode(todoAppRestSteps.createTodo(todoTask).code(), HTTP_CREATED);
@@ -67,7 +67,7 @@ public class WebSocketTests {
                         .anyMatch(message -> message.getData().equals(todoTask)));
     }
 
-    @Test(description = "WebSocket. Large amount of messages test")
+    @Test(description = "WebSocket. Check large amount of messages.")
     public void checkWsLargeAmountMessagesTest() {
         int start = 0;
         int finish = 100;
@@ -76,7 +76,7 @@ public class WebSocketTests {
                 () -> wsService.getWsMessages().size() == finish - start);
     }
 
-    @Test(description = "WebSocket. No messages except creation todo task test")
+    @Test(description = "WebSocket. Check no messages except creation todo task.")
     public void checkNoMessageTest() {
         TodoTask todoTask = new TodoTask("Test websocket message");
         checkResponseCode(todoAppRestSteps.createTodo(todoTask).code(), HTTP_CREATED);
@@ -88,7 +88,7 @@ public class WebSocketTests {
         assertThatDuringPeriod("Found message in WebSocket log", () -> wsService.getWsMessages().isEmpty());
     }
 
-    @Test(description = "WebSocket. Multiply parallel creation todo task messages test")
+    @Test(description = "WebSocket. Check multiply parallel creation todo task messages.")
     public void checkParallelMessagesTest() {
         List<TodoTask> todos = new ArrayList<>();
         IntStream.range(0, 10).forEach(numb -> {

@@ -45,7 +45,7 @@ public class PostTests {
         };
     }
 
-    @Test(description = "POST method todo task creation test")
+    @Test(description = "POST method. New todo task creation.")
     public void checkTodoCreation() {
         TodoTask todo = new TodoTask("Test todo example");
         int responseCode = todoAppRestSteps.createTodo(todo).code();
@@ -53,7 +53,7 @@ public class PostTests {
         assertThat("New todo-task wasn't created", todo, is(in(todoAppRestSteps.getTodos().body())));
     }
 
-    @Test(description = "POST method duplicate creation test")
+    @Test(description = "POST method. Duplicate todo task creation.")
     public void checkTodoDuplicateCreation() {
         TodoTask newTodo = new TodoTask("Test todo example");
         checkResponseCode(todoAppRestSteps.createTodo(newTodo).code(), HTTP_CREATED);
@@ -64,17 +64,17 @@ public class PostTests {
         assertThat("Todo duplicate was created", todoCount, equalTo(1));
     }
 
-    @Test(description = "POST method required fields test", dataProvider = "requiredFieldsData")
+    @Test(description = "POST method. Check required fields.", dataProvider = "requiredFieldsData")
     public void checkRequiredFields(Map<String, Object> requestBody) {
         checkResponseCode(todoAppRestSteps.createTodo(requestBody).code(), HTTP_BAD_REQUEST);
     }
 
-    @Test(description = "POST method invalid fields test", dataProvider = "invalidFieldTypesData")
+    @Test(description = "POST method. Check invalid field values.", dataProvider = "invalidFieldTypesData")
     public void checkInvalidFieldTypes(Map<String, Object> requestBody) {
         checkResponseCode(todoAppRestSteps.createTodo(requestBody).code(), HTTP_BAD_REQUEST);
     }
 
-    @Test(description = "POST method check wrong header test")
+    @Test(description = "POST method. Check wrong header.")
     public void checkWrongHeader() {
         TodoTask todo = new TodoTask("one more todo");
         checkResponseCode(todoAppRestSteps.createTodo(todo, Map.of("Content-Type", "text/plain")).code(),

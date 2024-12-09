@@ -53,10 +53,15 @@ Before you can run the tests, ensure you have the following installed on your sy
 
 2. **Run specific TestNG suites:**
    ```bash
-   ./gradlew test --tests PostTodosTest
+   ./gradlew test --tests PostTests
    ```
 
-3. **After running tests, the test report will be available at:**
+3. **Genereating allure-report:**
    ```bash
-   build/reports/tests/test/index.html
+   ./gradlew allureReport
+   ```
+
+4. **Report will be available at:**
+   ```bash
+   build/reports/allure-report/allureReport/index.html
    ```

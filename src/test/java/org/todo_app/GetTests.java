@@ -26,7 +26,7 @@ public class GetTests {
     @Inject
     private TodoAppRestSteps todoAppRestSteps;
 
-    @Test(description = "GET method success test")
+    @Test(description = "GET method. Success getting todos.")
     public void checkGetMethod() {
         todoAppRestSteps.createTodo(new TodoTask("Test todo example"));
         var response = todoAppRestSteps.getTodos();
@@ -35,7 +35,7 @@ public class GetTests {
 
     }
 
-    @Test(description = "GET method with empty body test")
+    @Test(description = "GET method. Empty todos list getting.")
     public void checkEmptyResponse() {
         todoAppRestSteps.deleteAllTodos();
         var response = todoAppRestSteps.getTodos();
@@ -43,7 +43,7 @@ public class GetTests {
         assertThat("Response body isn't empty", response.body().size(), equalTo(0));
     }
 
-    @Test(description = "GET method headers test")
+    @Test(description = "GET method. Check response headers.")
     public void checkResponseHeaders() {
         String message = "Response doesn't contain header";
         var response = todoAppRestSteps.getTodos();
@@ -52,7 +52,7 @@ public class GetTests {
         assertThat(message + " 'content-length'", response.headers().get("content-length"), notNullValue());
     }
 
-    @Test(description = "GET method with limit query parameter test")
+    @Test(description = "GET method. Get todos with limit query parameter.")
     public void checkLimitQueryParam() {
         int startId = 100;
         int endId = 109;
@@ -65,7 +65,7 @@ public class GetTests {
                 response.body().size(), equalTo(limit));
     }
 
-    @Test(description = "GET method with offset query parameter test")
+    @Test(description = "GET method. Get todos with offset query parameter.")
     public void checkOffsetQueryParam() {
         String todoText = "Some todo";
         int startId = 100;

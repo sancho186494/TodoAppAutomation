@@ -52,38 +52,38 @@ public class PutTests {
         checkResponseCode(todoAppRestSteps.createTodo(todo).code(), HTTP_CREATED);
     }
 
-    @Test(description = "PUT method change todo task test")
+    @Test(description = "PUT method. Editing existing todo task.")
     public void a1_checkTodoChange() {
         todo.setText("Changed text").setCompleted(true);
         checkResponseCode(todoAppRestSteps.editTodo(todo).code(), HTTP_OK);
         assertThat("Not found changed todo", todo, is(in(todoAppRestSteps.getTodos().body())));
     }
 
-    @Test(description = "PUT method no path id test")
+    @Test(description = "PUT method. Editing existing todo task with no path id in query.")
     public void a2_checkTodoChangeNoPathId() {
         todo.setText("Changed new").setCompleted(true);
         checkResponseCode(todoAppRestSteps.editTodoNoPathId(todo).code(), HTTP_BAD_METHOD);
         assertThat("Found changed todo", todo, is(not(in(todoAppRestSteps.getTodos().body()))));
     }
 
-    @Test(description = "PUT method check required fields test", dataProvider = "invalidRequestBodies")
+    @Test(description = "PUT method. Check required fields.", dataProvider = "invalidRequestBodies")
     public void a3_checkRequiredFields(Map<String, Object> requestBody) {
         checkResponseCode(todoAppRestSteps.editTodo(todo.getId(), requestBody).code(), HTTP_BAD_REQUEST);
     }
 
-    @Test(description = "PUT method check invalid fields test", dataProvider = "invalidFieldTypes")
+    @Test(description = "PUT method. Check invalid field values.", dataProvider = "invalidFieldTypes")
     public void a4_checkInvalidFieldTypes(Map<String, Object> requestBody) {
         checkResponseCode(todoAppRestSteps.editTodo(todo.getId(), requestBody).code(), HTTP_BAD_REQUEST);
     }
 
-    @Test(description = "PUT method wrong header test")
+    @Test(description = "PUT method. Check wrong header.")
     public void a5_checkWrongHeader() {
         todo.setCompleted(true);
         checkResponseCode(todoAppRestSteps.editTodo(todo, Map.of("Content-Type", "text/plain")).code(),
                 HTTP_UNSUPPORTED_TYPE);
     }
 
-    @Test(description = "PUT method wrong todo task id test")
+    @Test(description = "PUT method. Editing todo task by wrong id.")
     public void a6_checkWrongTodoId() {
         todo.setId(todo.getId() + 1).setCompleted(true);
         checkResponseCode(todoAppRestSteps.editTodo(todo).code(), HTTP_NOT_FOUND);

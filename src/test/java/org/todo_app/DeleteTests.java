@@ -30,19 +30,19 @@ public class DeleteTests {
         checkResponseCode(todoAppRestSteps.createTodo(todo).code(), HTTP_CREATED);
     }
 
-    @Test(description = "DELETE method success test")
+    @Test(description = "DELETE method. Success delete todos.")
     public void checkDeleteMethod() {
         checkResponseCode(todoAppRestSteps.deleteTodo(todo).code(), HTTP_NO_CONTENT);
         assertThat("Todo wasn't deleted", todo, is(not(in(todoAppRestSteps.getTodos().body()))));
     }
 
-    @Test(description = "DELETE method without auth test")
+    @Test(description = "DELETE method. Delete todos without auth.")
     public void checkDeleteMethodNoAuth() {
         checkResponseCode(todoAppRestSteps.deleteTodoNoAuth(todo).code(), HTTP_UNAUTHORIZED);
         assertThat("Todo was deleted", todo, is(in(todoAppRestSteps.getTodos().body())));
     }
 
-    @Test(description = "DELETE method with wrong id test")
+    @Test(description = "DELETE method. Delete todos with wrong id.")
     public void checkDeleteMethodNotFound() {
         checkResponseCode(todoAppRestSteps.deleteTodo(todo.getId() + 1).code(), HTTP_NOT_FOUND);
     }
