@@ -14,10 +14,12 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Collections.synchronizedList;
+
 public class TodoAppWebSocketService {
 
     private WebSocket webSocket;
-    private final List<WsMessage> wsMessages = new ArrayList<>();
+    private final List<WsMessage> wsMessages = synchronizedList(new ArrayList<>());
     private final CountDownLatch connectionLatch = new CountDownLatch(1);
 
     public void connect() throws InterruptedException {

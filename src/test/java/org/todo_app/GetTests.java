@@ -59,7 +59,7 @@ public class GetTests {
         int limit = 5;
 
         todoAppRestSteps.deleteAllTodos();
-        IntStream.rangeClosed(startId, endId).forEach(id -> todoAppRestSteps.createTodo(new TodoTask().setText("some todo")));
+        IntStream.rangeClosed(startId, endId).forEach(id -> todoAppRestSteps.createTodo(new TodoTask("some todo")));
         var response = todoAppRestSteps.getTodos(Map.of("limit", limit));
         assertThat("Response body size is greater than expected limit " + limit,
                 response.body().size(), equalTo(limit));
@@ -75,7 +75,7 @@ public class GetTests {
 
         todoAppRestSteps.deleteAllTodos();
         IntStream.rangeClosed(startId, endId).forEach(id -> {
-            TodoTask todoTask = new TodoTask().setId(id).setText(todoText + id);
+            TodoTask todoTask = new TodoTask(todoText + id).setId(id);
             todoAppRestSteps.createTodo(todoTask);
             if (id >= startId + offset) {
                 expectedTodos.add(todoTask);

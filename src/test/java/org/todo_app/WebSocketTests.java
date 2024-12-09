@@ -6,13 +6,16 @@ import io.qameta.allure.Story;
 import org.testng.annotations.*;
 import org.todo_app.api.TodoAppWebSocketService;
 import org.todo_app.models.TodoTask;
-import org.todo_app.models.WsMessage;
 import org.todo_app.steps.TodoAppRestSteps;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.IntStream;
+
 import static java.net.HttpURLConnection.HTTP_CREATED;
-import static org.todo_app.utils.AllureMatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
+import static org.todo_app.utils.AllureMatcherAssert.assertThatDuringPeriod;
+import static org.todo_app.utils.AllureMatcherAssert.assertThatWithWait;
 import static org.todo_app.utils.AssertionsUtil.checkResponseCode;
 
 @Feature("TodoApp API")
@@ -41,27 +44,74 @@ public class WebSocketTests {
         wsService.closeConnection();
     }
 
-    @Test
-    public void checkWebSocket() {
+    @Test(description = "WebSocket. Connection test")
+    public void wsConnectionTest() {
         checkResponseCode(todoAppRestSteps.createTodo(new TodoTask("some task")).code(), HTTP_CREATED);
-        assertThat("WebSocket log is empty", wsService.getWsMessages().size(), not(equalTo(0)));
+        assertThatWithWait("WebSocket log is empty", () -> !wsService.getWsMessages().isEmpty());
     }
 
-    @Test
-    public void checkWebSocketCreateMessageType() {
+    @Test(description = "WebSocket. Received messages type test")
+    public void checkWsCreateMessageType() {
         checkResponseCode(todoAppRestSteps.createTodo(new TodoTask("some task")).code(), HTTP_CREATED);
-        WsMessage wsMessage = wsService.getWsMessages().stream()
-                .findFirst().orElseThrow(() -> new RuntimeException("WebSocket log is empty"));
-        assertThat("WebSocket message type not equal 'new_todo'", wsMessage.getType(), equalTo("new_todo"));
+        assertThatWithWait("WebSocket message type doesn't equal expected type 'new_todo'",
+                () -> wsService.getWsMessages().stream()
+                        .anyMatch(message -> message.getType().equals("new_todo")));
     }
 
-    @Test
-    public void checkWebSocketMessageTodoExists() {
+    @Test(description = "WebSocket. Received message with new todo test")
+    public void checkWsMessageTodoExists() {
         TodoTask todoTask = new TodoTask("Test websocket message");
         checkResponseCode(todoAppRestSteps.createTodo(todoTask).code(), HTTP_CREATED);
-        var wsMessage = wsService.getWsMessages().stream()
-                .filter(message -> message.getData().equals(todoTask))
-                .findAny();
-        assertThat("No message with new todo-task in WebSocket log", wsMessage.isPresent());
+        assertThatWithWait("Not found message with new todo-task in WebSocket log",
+                () -> wsService.getWsMessages().stream()
+                        .anyMatch(message -> message.getData().equals(todoTask)));
+    }
+
+    @Test(description = "WebSocket. Large amount of messages test")
+    public void checkWsLargeAmountMessagesTest() {
+        int start = 0;
+        int finish = 100;
+        IntStream.range(start, finish).forEach(numb -> todoAppRestSteps.createTodo(new TodoTask("some task")));
+        assertThatWithWait("WebSocket log doesn't contain messages count = " + (finish - start),
+                () -> wsService.getWsMessages().size() == finish - start);
+    }
+
+    @Test(description = "WebSocket. No messages except creation todo task test")
+    public void checkNoMessageTest() {
+        TodoTask todoTask = new TodoTask("Test websocket message");
+        checkResponseCode(todoAppRestSteps.createTodo(todoTask).code(), HTTP_CREATED);
+        wsService.clearWsLog();
+        todoAppRestSteps.getTodos();
+        todoAppRestSteps.editTodo(todoTask.setCompleted(true));
+        todoAppRestSteps.deleteTodo(todoTask);
+        todoAppRestSteps.createTodo(new TodoTask());
+        assertThatDuringPeriod("Found message in WebSocket log", () -> wsService.getWsMessages().isEmpty());
+    }
+
+    @Test(description = "WebSocket. Multiply parallel creation todo task messages test")
+    public void checkParallelMessagesTest() {
+        List<TodoTask> todos = new ArrayList<>();
+        IntStream.range(0, 10).forEach(numb -> {
+            TodoTask task = new TodoTask("Some task " + numb);
+            todos.add(task);
+            createThread(task).start();
+        });
+        todos.forEach(todoTask -> {
+            assertThatWithWait("Not found creation message in WebSocket log with task " + todoTask,
+                    () -> wsService.getWsMessages().stream().anyMatch(wsMessage -> wsMessage.getData().equals(todoTask)));
+        });
+    }
+
+    private Thread createThread(TodoTask todoTask) {
+        return new Thread(() -> {
+            int minDelay = 250;
+            int maxDelay = 5000;
+            try {
+                Thread.sleep(new Random().nextLong((maxDelay - minDelay) + 1) + minDelay);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            todoAppRestSteps.createTodo(todoTask);
+        });
     }
 }

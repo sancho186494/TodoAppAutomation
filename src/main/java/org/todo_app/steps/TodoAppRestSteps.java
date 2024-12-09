@@ -33,7 +33,7 @@ public class TodoAppRestSteps {
     }
 
     @Step("Create todo task '{0}'")
-    public Response<Void> createTodo(TodoTask todoTask) {
+    public synchronized Response<Void> createTodo(TodoTask todoTask) {
         return executeRequest(service.createTodo(todoTask));
     }
 
